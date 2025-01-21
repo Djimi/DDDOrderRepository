@@ -81,8 +81,7 @@ public class OrderCreateCommandHandler {
                                                    " with restaurant id: " + createOrderCommand.getRestaurantId());
         }
 
-        return restaurantInformation.get()
-
+        return restaurantInformation.get();
     }
 
     private void checkCustomer(@NotNull UUID customerId) {
