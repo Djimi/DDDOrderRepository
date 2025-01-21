@@ -33,6 +33,9 @@ public class OrderCreateCommandHandler {
 
     private final RestaurantRepository restaurantRepository;
 
+    private final OrderDataMapper orderDataMapper;
+    private ApplicationDomainEventPublisher applicationDomainEventPublisher;
+
     public OrderCreateCommandHandler(OrderDomainService orderDomainService, OrderRepository orderRepository, CustomerRepository customerRepository,
                                      RestaurantRepository restaurantRepository, OrderDataMapper orderDataMapper) {
         this.orderDomainService = orderDomainService;
@@ -41,8 +44,6 @@ public class OrderCreateCommandHandler {
         this.restaurantRepository = restaurantRepository;
         this.orderDataMapper = orderDataMapper;
     }
-
-    private final OrderDataMapper orderDataMapper;
 
     @Transactional
     public CreateOrderResponse createOder(CreateOrderCommand createOrderCommand) {
@@ -57,6 +58,7 @@ public class OrderCreateCommandHandler {
         CreateOrderResponse createOrderResponse = orderDataMapper.orderToCreateOrderResponse(orderResult);
 
 
+        applicationDomainEventPublisher.publish(orderCreatedEvent);
         return createOrderResponse;
     }
 
@@ -70,6 +72,8 @@ public class OrderCreateCommandHandler {
         }
 
         log.info("Order is saved with id: {}", orderResult.getId().getValue());
+
+        return orderResult;
     }
 
     private Restaurant checkRestaurant(CreateOrderCommand createOrderCommand) {
