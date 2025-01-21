@@ -1,0 +1,74 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.4.1' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+dependencies {
+}
+
+subprojects {
+    apply plugin: 'maven-publish'
+    apply plugin: 'java'
+//    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencyManagement {
+        imports {
+            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+        }
+    }
+
+    group = 'com.example.foodordering'
+    version = '1.0.0-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    publishing {
+        publications {
+            myPublication(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    tasks.register('buildAndPublish') {
+        group = 'custom' // Optional: set the group for better task categorization
+        description = 'Builds the project and publishes to Maven Local'
+
+        dependsOn 'build'
+        dependsOn 'publishToMavenLocal'
+
+        // Ensure `publishToMavenLocal` exists (for projects without the publishing plugin)
+        doFirst {
+            if (!tasks.findByName('publishToMavenLocal')) {
+                throw new GradleException("'publishToMavenLocal' task not found in project: ${project.name}")
+            }
+        }
+
+    }
+
+    tasks.register("bap") {
+        dependsOn "buildAndPublish"
+    }
+
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
