@@ -3,6 +3,7 @@ package com.food.ordering.system.order.service.domain.mapper;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderCommand;
 import com.food.ordering.system.order.service.domain.dto.create.CreateOrderResponse;
 import com.food.ordering.system.order.service.domain.dto.create.OrderAddress;
+import com.food.ordering.system.order.service.domain.dto.track.TrackOrderResponse;
 import food.ordering.system.domain.valueobject.CustomerId;
 import food.ordering.system.domain.valueobject.Money;
 import food.ordering.system.domain.valueobject.ProductId;
@@ -22,6 +23,13 @@ import java.util.stream.Collectors;
 @Component
 public class OrderDataMapper {
 
+    public TrackOrderResponse orderToTrackOrderResponse(Order order) {
+        return TrackOrderResponse.builder()
+                .orderTrackingId(order.getTrackingId().getValue())
+                .orderStatus(order.getOrderStatus())
+                .failureMessages(order.getFailureMessages())
+                .build();
+    }
     public CreateOrderResponse orderToCreateOrderResponse(Order order) {
         return CreateOrderResponse.builder()
                 .orderTrackingId(order.getTrackingId().getValue())
